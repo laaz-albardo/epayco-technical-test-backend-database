@@ -5,11 +5,15 @@ import { UserRepository } from './repositories';
 import { User } from './schemas';
 import { UserDocument } from './types';
 import { isNotEmpty } from 'class-validator';
+import { WalletService } from '../wallet';
 
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserRepository.name);
-  constructor(private readonly repository: UserRepository) {}
+  constructor(
+    private readonly repository: UserRepository,
+    private readonly walletService: WalletService,
+  ) {}
 
   async create(data: CreateUserDto): Promise<User> {
     try {
@@ -28,6 +32,12 @@ export class UserService {
       user = await this.repository.save(user);
 
       this.logger.log('user created successfully');
+
+      await this.walletService.create({
+        balance: 0,
+        status: true,
+        user: user._id as any,
+      });
 
       return user;
     } catch (err) {
@@ -99,6 +109,8 @@ export class UserService {
       this.logger.log('delete user...');
 
       await this.findOne(_id);
+
+      await this.walletService.remove(_id);
 
       const deleteUser = await this.repository.delete(_id);
 
