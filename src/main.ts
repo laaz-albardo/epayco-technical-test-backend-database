@@ -7,7 +7,9 @@ import {
 import { useContainer } from 'class-validator';
 import { Logger, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ClassValidatorConfig, IServer } from './config';
+import { ClassValidatorConfig, IJwt, IServer } from './config';
+import cookieParser from 'cookie-parser';
+import fastifyCookie from '@fastify/cookie';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -20,6 +22,8 @@ async function bootstrap() {
     .get<ConfigService>(ConfigService)
     .get<IServer>('server');
 
+  const { secret } = app.get<ConfigService>(ConfigService).get<IJwt>('jwt');
+
   // Global prefix
   app.setGlobalPrefix('api');
 
@@ -27,6 +31,18 @@ async function bootstrap() {
   app.enableCors({
     origin: '*',
     credentials: true,
+  });
+
+  // fastify cookies
+  app.use(cookieParser());
+  await app.register(fastifyCookie, {
+    parseOptions: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+    },
+    secret: secret,
   });
 
   app.enableVersioning({
