@@ -9,6 +9,7 @@ import { map } from 'rxjs/operators';
 import { AuthTransformer } from '../transformers';
 import { FastifyReply } from 'fastify';
 import { ConfigService } from '@nestjs/config';
+import { IJwt } from '@src/config';
 
 @Injectable()
 export class LoginInterceptor<T>
@@ -19,9 +20,9 @@ export class LoginInterceptor<T>
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const res = context.switchToHttp().getResponse<FastifyReply>();
 
-    const expires = new Date(
-      Date.now() + Number(this.config.getOrThrow('JWT_EXPIRES') * 1000),
-    );
+    const { expiresIn } = this.config.get<IJwt>('jwt');
+
+    const expires = new Date(Date.now() + Number(expiresIn * 1000));
 
     return next.handle().pipe(
       map(
