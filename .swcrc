@@ -15,7 +15,8 @@
       "paths": {
         "@src/*": ["src/*"],
         "@config/*": ["src/config/*"],
-        "@modules/*": ["src/modules/*"]
+        "@modules/*": ["src/modules/*"],
+        "@shared/*": ["src/shared/*"]
       },
       "target": "es2021"
     },
