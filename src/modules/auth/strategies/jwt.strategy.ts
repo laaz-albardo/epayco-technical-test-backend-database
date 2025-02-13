@@ -1,7 +1,7 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { UserService } from '@src/modules/user';
+import { UserRepository } from '@src/modules/user';
 import { IJWTPayload } from '../interfaces';
 import { ConfigService } from '@nestjs/config';
 import { FastifyRequest } from 'fastify';
@@ -11,7 +11,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   private readonly logger = new Logger(JwtStrategy.name);
 
   constructor(
-    private readonly userService: UserService,
+    private readonly userRepository: UserRepository,
     private readonly config: ConfigService,
   ) {
     super({
@@ -35,7 +35,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     try {
       this.logger.log('auth user token...');
 
-      const user = await this.userService.findOne(payload._id as string);
+      const user = await this.userRepository.findOneById(payload._id as string);
 
       if (!user) {
         throw new UnauthorizedException();
