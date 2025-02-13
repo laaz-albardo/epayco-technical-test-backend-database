@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { configLoader, envConfigSchema } from './config';
+import { configLoader, envConfigSchema, MongooseConfig } from './config';
 
 @Module({
   imports: [
@@ -10,6 +10,7 @@ import { configLoader, envConfigSchema } from './config';
       load: [configLoader],
       validationSchema: envConfigSchema,
     }),
+    MongooseConfig,
   ],
 })
 export class AppModule {}
