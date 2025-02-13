@@ -1,26 +1,80 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateWalletDto } from './dto/create-wallet.dto';
 import { UpdateWalletDto } from './dto/update-wallet.dto';
+import { WalletRepository } from './repositories';
+import { Wallet } from './schemas';
+import { WalletDocument } from './types';
 
 @Injectable()
 export class WalletService {
-  create(createWalletDto: CreateWalletDto) {
-    return 'This action adds a new wallet';
+  private readonly logger = new Logger(WalletRepository.name);
+
+  constructor(private readonly repository: WalletRepository) {}
+
+  async create(data: CreateWalletDto): Promise<Wallet> {
+    try {
+      this.logger.log('creating wallet...');
+
+      let wallet = await this.repository.create(data);
+
+      wallet = await this.repository.save(wallet);
+
+      this.logger.log('wallet created successfully');
+
+      return wallet;
+    } catch (err) {
+      throw err;
+    }
   }
 
-  findAll() {
-    return `This action returns all wallet`;
+  async findOneByUser(_id: string): Promise<WalletDocument> {
+    const walletByUser = await (
+      await this.repository.findOne({ user: _id })
+    ).populate('user');
+
+    return walletByUser;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} wallet`;
+  async update(_id: string, data: UpdateWalletDto): Promise<Wallet> {
+    try {
+      this.logger.log('update wallet...');
+
+      const validateWallet = await this.findOneByUser(_id);
+
+      if (!validateWallet) {
+        throw new NotFoundException('Wallet not found');
+      }
+
+      const updateWallet = await this.repository.update(
+        validateWallet.id,
+        data as WalletDocument,
+      );
+
+      this.logger.log('wallet updated successfully');
+
+      return updateWallet;
+    } catch (err) {
+      throw err;
+    }
   }
 
-  update(id: number, updateWalletDto: UpdateWalletDto) {
-    return `This action updates a #${id} wallet`;
-  }
+  async remove(_id: string) {
+    try {
+      this.logger.log('delete wallet...');
 
-  remove(id: number) {
-    return `This action removes a #${id} wallet`;
+      const validateWallet = await this.findOneByUser(_id);
+
+      if (!validateWallet) {
+        throw new NotFoundException('Wallet not found');
+      }
+
+      const deleteWallet = await this.repository.delete(validateWallet.id);
+
+      this.logger.log('wallet deleted successfully');
+
+      return deleteWallet;
+    } catch (err) {
+      throw err;
+    }
   }
 }

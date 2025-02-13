@@ -42,7 +42,7 @@ export class UserController {
   }
 
   @AuthAll()
-  @Patch(':id')
+  @Patch()
   @HttpCode(HttpStatus.ACCEPTED)
   update(@Req() req: FastifyRequest, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(req['user']._id, updateUserDto);
