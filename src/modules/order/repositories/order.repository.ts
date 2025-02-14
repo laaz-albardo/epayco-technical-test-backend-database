@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { OrderDocument } from '../types';
 import { FilterQuery, Model } from 'mongoose';
 import { IOrder } from '../interfaces';
+import { IUser } from '@src/modules/user';
 
 @Injectable()
 export class OrderRepository extends BaseMongoDbRepository<OrderDocument> {
@@ -40,10 +41,10 @@ export class OrderRepository extends BaseMongoDbRepository<OrderDocument> {
 
     sortFilter['createdAt'] = orderByCreatedAt ?? -1;
 
-    return await this.repository
-      .find(filter)
-      .sort(sortFilter)
-      .populate('user')
-      .exec();
+    return await this.repository.find(filter).sort(sortFilter).exec();
+  }
+
+  async updateUserData(_id: string, user: IUser) {
+    return await this.repository.updateMany({ 'user._id': _id }, { user });
   }
 }

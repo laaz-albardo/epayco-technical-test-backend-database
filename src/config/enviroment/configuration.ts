@@ -25,7 +25,7 @@ export const configLoader = (): IConfiguration => {
       port: Number(process.env.SMTP_PORT),
       username: process.env.SMTP_USERNAME,
       password: process.env.SMTP_PASSWORD,
-      secureSsl: Boolean(process.env.SMTP_SECURE_SSL),
+      secureSsl: process.env.SMTP_SECURE_SSL,
       senderName: process.env.SMTP_SENDER_NAME,
       senderEmailDefault: process.env.SMTP_SENDER_EMAIL_DEFAULT,
     },

@@ -19,4 +19,13 @@ export class UserRepository extends BaseMongoDbRepository<UserDocument> {
   async findAll(): Promise<User[]> {
     return await this.repository.find().exec();
   }
+
+  // async findOneByDocumentAndPhoneNumber(
+  //   dni: string,
+  //   phoneNumber: string,
+  // ): Promise<User> {
+  //   return await this.repository
+  //     .findOne({ person: { dni: dni, phoneNumber: phoneNumber } })
+  //     .exec();
+  // }
 }

@@ -24,7 +24,7 @@ export interface ISmtp {
   port: number;
   username: string;
   password: string;
-  secureSsl: boolean;
+  secureSsl: string;
   senderName: string;
   senderEmailDefault: string;
 }

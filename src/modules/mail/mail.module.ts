@@ -25,7 +25,7 @@ import { ISmtp } from '@src/config';
           transport: {
             host: host,
             port: port,
-            secure: secureSsl,
+            secure: secureSsl === 'true',
             auth: {
               user: username,
               pass: password,

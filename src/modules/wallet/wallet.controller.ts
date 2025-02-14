@@ -1,22 +1,31 @@
-import { Controller, Get, Body, Patch, Req } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param } from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { UpdateWalletDto } from './dto/update-wallet.dto';
 import { AuthAll } from '../auth';
-import { FastifyRequest } from 'fastify';
 
 @Controller('wallet')
 export class WalletController {
   constructor(private readonly walletService: WalletService) {}
 
   @AuthAll()
-  @Get('my-wallet')
-  findOne(@Req() req: FastifyRequest) {
-    return this.walletService.findOneByUser(req['user']._id);
+  @Get('my-wallet/:document/:phoneNumber')
+  findOne(
+    @Param('document') document: string,
+    @Param('phoneNumber') phoneNumber: string,
+  ) {
+    return this.walletService.findOneByDocumentAndPhoneNumber(
+      document,
+      phoneNumber,
+    );
   }
 
   @AuthAll()
-  @Patch('update-wallet')
-  update(@Req() req: FastifyRequest, @Body() updateWalletDto: UpdateWalletDto) {
-    return this.walletService.update(req['user']._id, updateWalletDto);
+  @Patch('update-wallet/:document/:phoneNumber')
+  update(
+    @Param('document') document: string,
+    @Param('phoneNumber') phoneNumber: string,
+    @Body() updateWalletDto: UpdateWalletDto,
+  ) {
+    return this.walletService.update(document, phoneNumber, updateWalletDto);
   }
 }

@@ -1,10 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IOrder } from '../interfaces';
-import { Types } from 'mongoose';
-import { IUser, User } from '@src/modules/user';
+import { IUser, UserSchema } from '@src/modules/user';
 
 @Schema({ timestamps: true })
 export class Order implements IOrder {
+  @Prop({ type: String, required: false })
+  sesionId: string;
+
   @Prop({ type: String, required: false })
   token: string;
 
@@ -17,7 +19,7 @@ export class Order implements IOrder {
   @Prop({ type: Date, required: false })
   datePaid: Date;
 
-  @Prop({ type: Types.ObjectId, ref: User.name, required: true })
+  @Prop({ type: UserSchema, required: true })
   user: IUser;
 }
 

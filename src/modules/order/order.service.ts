@@ -1,15 +1,11 @@
-import {
-  ConflictException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderRepository } from './repositories';
-import { Order } from './schemas';
 import { OrderDocument } from './types';
 import { WalletService } from '../wallet';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class OrderService {
@@ -18,19 +14,39 @@ export class OrderService {
   constructor(
     private readonly repository: OrderRepository,
     private readonly walletService: WalletService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async create(data: CreateOrderDto): Promise<Order> {
+  async initiatePayment(
+    document: string,
+    phoneNumber: string,
+    data: CreateOrderDto,
+  ) {
     try {
-      this.logger.log('creating order...');
+      const wallet = await this.walletService.findOneByDocumentAndPhoneNumber(
+        document,
+        phoneNumber,
+      );
 
-      let order = await this.repository.create(data);
+      const sesionId = crypto.randomBytes(16).toString('hex');
+      const token = Math.floor(100000 + Math.random() * 900000).toString();
 
-      order = await this.repository.save(order);
+      await this.repository.save({
+        total: data.total,
+        sesionId,
+        token,
+        user: wallet.user,
+      } as any);
 
-      this.logger.log('order created successfully');
+      const dataEmail = {
+        email: wallet.user.email,
+        person: wallet.user.person,
+        token,
+      };
 
-      return order;
+      this.eventEmitter.emit('SEND_MAILER', dataEmail);
+
+      return { message: 'Confirmation token sent', sesionId };
     } catch (err) {
       throw err;
     }
@@ -63,53 +79,27 @@ export class OrderService {
   async findOne(_id: string): Promise<OrderDocument> {
     this.logger.log('get order by id...');
 
-    const orderById = await (
-      await this.repository.findOneById(_id)
-    ).populate('user');
+    const orderById = await this.repository.findOneById(_id);
 
     this.logger.log('order successfully');
 
     return orderById;
   }
 
-  async update(_id: string, data: UpdateOrderDto): Promise<Order> {
+  async updateUserOrder(_id: string, data: UpdateOrderDto) {
     try {
       this.logger.log('update order...');
 
-      const validateOrder = await this.findOne(_id);
-
-      if (!validateOrder) {
-        throw new NotFoundException('Order not found');
-      }
-
-      if (validateOrder.isPaid || validateOrder.datePaid) {
-        throw new ConflictException('This order is already paid');
-      }
-
-      const userWallet = await this.walletService.findOneByUser(
-        validateOrder.user.id,
+      const validateOrder = await this.repository.updateUserData(
+        _id,
+        data as any,
       );
-
-      if (data.total > userWallet.balance) {
-        throw new ConflictException(
-          'Does not have the balance to pay the bill',
-        );
-      }
-
-      const updateOrder = await this.repository.update(validateOrder.id, {
-        isPaid: true,
-        datePaid: new Date(),
-      } as OrderDocument);
 
       this.logger.log('order updated successfully');
 
-      return updateOrder;
+      return validateOrder;
     } catch (err) {
       throw err;
     }
-  }
-
-  remove(id: string) {
-    return `This action removes a #${id} order`;
   }
 }

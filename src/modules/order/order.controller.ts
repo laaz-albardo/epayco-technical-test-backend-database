@@ -3,9 +3,7 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
-  Delete,
   Query,
   ParseIntPipe,
   ParseBoolPipe,
@@ -13,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
 import { ParseMongoIdPipe } from '@src/shared';
 import { AuthAll } from '../auth';
 import { FastifyRequest } from 'fastify';
@@ -23,9 +20,17 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @AuthAll()
-  @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.create(createOrderDto);
+  @Post('create-invoice/:document/:phoneNumber')
+  create(
+    @Param('document') document: string,
+    @Param('phoneNumber') phoneNumber: string,
+    @Body() createOrderDto: CreateOrderDto,
+  ) {
+    return this.orderService.initiatePayment(
+      document,
+      phoneNumber,
+      createOrderDto,
+    );
   }
 
   @AuthAll()
@@ -71,16 +76,5 @@ export class OrderController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.orderService.findOne(id);
-  }
-
-  @AuthAll()
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.orderService.update(id, updateOrderDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.orderService.remove(id);
   }
 }

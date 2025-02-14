@@ -18,7 +18,7 @@ declare namespace NodeJS {
     SMTP_PORT: number;
     SMTP_USERNAME: string;
     SMTP_PASSWORD: string;
-    SMTP_SECURE_SSL: boolean;
+    SMTP_SECURE_SSL: string;
     SMTP_SENDER_NAME: string;
     SMTP_SENDER_EMAIL_DEFAULT: string;
   }

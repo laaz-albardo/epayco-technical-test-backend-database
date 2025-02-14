@@ -17,7 +17,6 @@ export class User implements Partial<IUser> {
     type: String,
     length: 50,
     required: true,
-    unique: true,
     lowercase: true,
     index: true,
   })
