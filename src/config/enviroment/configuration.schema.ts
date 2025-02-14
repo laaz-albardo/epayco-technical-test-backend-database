@@ -15,4 +15,11 @@ export const envConfigSchema = Joi.object({
   MONGODB_PASSWORD: Joi.string().required(),
   JWT_SECRET: Joi.string().default('MySecretkey'),
   JWT_EXPIRES: Joi.string().default(43200),
+  SMTP_HOST: Joi.string().required(),
+  SMTP_PORT: Joi.string().required(),
+  SMTP_USERNAME: Joi.string().required(),
+  SMTP_PASSWORD: Joi.string().required(),
+  SMTP_SECURE_SSL: Joi.boolean().required(),
+  SMTP_SENDER_NAME: Joi.string().required(),
+  SMTP_SENDER_EMAIL_DEFAULT: Joi.string().email().required(),
 });

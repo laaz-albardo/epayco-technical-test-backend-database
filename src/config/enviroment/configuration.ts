@@ -20,5 +20,14 @@ export const configLoader = (): IConfiguration => {
       secret: process.env.JWT_SECRET,
       expiresIn: process.env.JWT_EXPIRES,
     },
+    smtp: {
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT),
+      username: process.env.SMTP_USERNAME,
+      password: process.env.SMTP_PASSWORD,
+      secureSsl: Boolean(process.env.SMTP_SECURE_SSL),
+      senderName: process.env.SMTP_SENDER_NAME,
+      senderEmailDefault: process.env.SMTP_SENDER_EMAIL_DEFAULT,
+    },
   };
 };
