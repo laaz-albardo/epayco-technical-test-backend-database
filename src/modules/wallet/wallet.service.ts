@@ -108,6 +108,24 @@ export class WalletService {
     }
   }
 
+  async updateWalletOrder(_id: string, balance: number): Promise<Wallet> {
+    try {
+      this.logger.log('update wallet...');
+
+      const validateWallet = await this.findOneByUser(_id);
+
+      const updateWallet = await this.repository.update(validateWallet.id, {
+        balance: balance,
+      } as any);
+
+      this.logger.log('wallet updated successfully');
+
+      return updateWallet;
+    } catch (err) {
+      throw err;
+    }
+  }
+
   async remove(_id: string) {
     try {
       this.logger.log('delete wallet...');

@@ -33,6 +33,14 @@ export class OrderController {
     );
   }
 
+  @Post('pay-invoice/:sesionId/:token')
+  payInvoice(
+    @Param('sesionId') sesionId: string,
+    @Param('token') token: string,
+  ) {
+    return this.orderService.confirmPayment(sesionId, token);
+  }
+
   @AuthAll()
   @Get()
   findAll(

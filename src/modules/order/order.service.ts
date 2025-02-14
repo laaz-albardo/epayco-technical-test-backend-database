@@ -1,4 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderRepository } from './repositories';
@@ -41,6 +46,7 @@ export class OrderService {
       const dataEmail = {
         email: wallet.user.email,
         person: wallet.user.person,
+        sesionId,
         token,
       };
 
@@ -50,6 +56,38 @@ export class OrderService {
     } catch (err) {
       throw err;
     }
+  }
+
+  async confirmPayment(sesionId: string, token: string) {
+    const order = await this.repository.findOne({
+      sesionId: sesionId,
+      token: token,
+    });
+
+    if (!order) {
+      throw new BadRequestException('Order not found');
+    }
+
+    const wallet = await this.walletService.findOneByUser(order.user.id);
+
+    if (!wallet.status) {
+      throw new ConflictException('This wallet is not active');
+    }
+
+    if (wallet.balance < order.total) {
+      throw new ConflictException('Insufficient amount to pay');
+    }
+
+    const pay = wallet.balance - order.total;
+
+    await this.walletService.updateWalletOrder(order.user.id, pay);
+
+    await this.repository.update(order.id, {
+      isPaid: true,
+      datePaid: new Date(),
+    } as any);
+
+    return { mensaje: 'Pago confirmado y realizado con éxito' };
   }
 
   async findAll(
