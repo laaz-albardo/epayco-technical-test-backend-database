@@ -14,21 +14,13 @@ export class LogoutInterceptor<T>
 {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const res = context.switchToHttp().getResponse<FastifyReply>();
-
-    const expires = new Date(Date.now());
-
     return next.handle().pipe(
-      map(
-        async () => (
-          res.clearCookie('token', { expires }),
-          {
-            statusCode: res.statusCode,
-            msg: 'Session end',
-            data: null as any,
-            errors: null,
-          }
-        ),
-      ),
+      map(async () => ({
+        statusCode: res.statusCode,
+        msg: 'Session end',
+        data: null as any,
+        errors: null,
+      })),
     );
   }
 }
