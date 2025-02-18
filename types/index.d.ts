@@ -6,6 +6,8 @@ declare namespace NodeJS {
     NODE_ENV: string;
     SERVER_HOST: string;
     SERVER_PORT: number;
+    WEB_SERVER_HOST: string;
+    WEB_SERVER_PORT: number;
     MONGODB_HOST: string;
     MONGODB_PORT: number;
     MONGODB_DBNAME: string;

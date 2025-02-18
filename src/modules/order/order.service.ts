@@ -87,7 +87,7 @@ export class OrderService {
       datePaid: new Date(),
     } as any);
 
-    return { mensaje: 'Pago confirmado y realizado con éxito' };
+    return { mensaje: 'Payment confirmed and successfully completed' };
   }
 
   async findAll(

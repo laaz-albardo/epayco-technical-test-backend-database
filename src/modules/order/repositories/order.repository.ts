@@ -28,7 +28,7 @@ export class OrderRepository extends BaseMongoDbRepository<OrderDocument> {
     const sortFilter = {};
 
     if (user) {
-      filter['user'] = user;
+      filter['user._id'] = user;
     }
 
     if (isPaid) {

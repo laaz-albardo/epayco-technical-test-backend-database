@@ -3,6 +3,8 @@ export interface IServer {
   environment: string;
   host: string;
   port: number;
+  webHost: string;
+  webPort: number;
 }
 
 export interface IDatabase {

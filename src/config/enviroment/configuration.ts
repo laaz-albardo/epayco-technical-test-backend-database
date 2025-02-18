@@ -7,6 +7,8 @@ export const configLoader = (): IConfiguration => {
       environment: process.env.NODE_ENV,
       host: process.env.SERVER_HOST,
       port: Number(process.env.SERVER_PORT),
+      webHost: process.env.WEB_SERVER_HOST,
+      webPort: Number(process.env.WEB_SERVER_PORT),
     },
     db: {
       host: process.env.MONGODB_HOST,

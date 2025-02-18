@@ -18,7 +18,7 @@ export class PaymentEmailListener {
     try {
       this.logger.log('send email...');
 
-      const { host, port } = this.configService.get<IServer>('server');
+      const { webHost, webPort } = this.configService.get<IServer>('server');
 
       await this.mailService.sendMail({
         to: email,
@@ -26,10 +26,10 @@ export class PaymentEmailListener {
         template: './verify-payment',
         context: {
           name: person.fullName,
-          sesionId: sesionId,
           token: token,
-          host: host,
-          port: port,
+          sesionId: sesionId,
+          host: webHost,
+          port: webPort,
         },
       });
 

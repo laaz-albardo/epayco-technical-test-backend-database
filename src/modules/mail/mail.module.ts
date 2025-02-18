@@ -32,7 +32,7 @@ import { ISmtp } from '@src/config';
             },
           },
           defaults: {
-            from: `"No Reply" <${senderEmailDefault}>`,
+            from: senderEmailDefault,
           },
           template: {
             dir: join(__dirname, 'templates'),

@@ -76,8 +76,10 @@ export class WalletService {
         throw new ConflictException('The wallet is not active');
       }
 
+      const totalBalance = validateWallet.balance + data.balance;
+
       const updateWallet = await this.repository.update(validateWallet.id, {
-        balance: data.balance,
+        balance: totalBalance,
       } as any);
 
       this.logger.log('wallet updated successfully');

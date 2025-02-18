@@ -6,7 +6,9 @@ export const envConfigSchema = Joi.object({
     .valid('development', 'production')
     .default('development'),
   SERVER_HOST: Joi.string().default('http://127.0.0.1'),
-  SERVER_PORT: Joi.string().default(3000),
+  SERVER_PORT: Joi.string().default(4000),
+  WEB_SERVER_HOST: Joi.string().default('http://127.0.0.1'),
+  WEB_SERVER_PORT: Joi.string().default(3000),
   MONGODB_HOST: Joi.string().default('localhost'),
   MONGODB_PORT: Joi.string().default(27017),
   MONGODB_URL: Joi.string().required(),
