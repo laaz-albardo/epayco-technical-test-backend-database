@@ -6,7 +6,9 @@ export const envConfigSchema = Joi.object({
     .valid('development', 'production')
     .default('development'),
   SERVER_HOST: Joi.string().default('http://127.0.0.1'),
-  SERVER_PORT: Joi.string().default(3000),
+  SERVER_PORT: Joi.string().default(4000),
+  WEB_SERVER_HOST: Joi.string().default('http://127.0.0.1'),
+  WEB_SERVER_PORT: Joi.string().default(3000),
   MONGODB_HOST: Joi.string().default('localhost'),
   MONGODB_PORT: Joi.string().default(27017),
   MONGODB_URL: Joi.string().required(),
@@ -15,4 +17,11 @@ export const envConfigSchema = Joi.object({
   MONGODB_PASSWORD: Joi.string().required(),
   JWT_SECRET: Joi.string().default('MySecretkey'),
   JWT_EXPIRES: Joi.string().default(43200),
+  SMTP_HOST: Joi.string().required(),
+  SMTP_PORT: Joi.string().required(),
+  SMTP_USERNAME: Joi.string().required(),
+  SMTP_PASSWORD: Joi.string().required(),
+  SMTP_SECURE_SSL: Joi.boolean().required(),
+  SMTP_SENDER_NAME: Joi.string().required(),
+  SMTP_SENDER_EMAIL_DEFAULT: Joi.string().email().required(),
 });

@@ -1,6 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { configLoader, envConfigSchema } from './config';
+import { configLoader, envConfigSchema, MongooseConfig } from './config';
+import {
+  AuthModule,
+  MailModule,
+  OrderModule,
+  UserModule,
+  WalletModule,
+} from './modules';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -10,6 +18,13 @@ import { configLoader, envConfigSchema } from './config';
       load: [configLoader],
       validationSchema: envConfigSchema,
     }),
+    EventEmitterModule.forRoot({ global: true }),
+    MongooseConfig,
+    UserModule,
+    AuthModule,
+    WalletModule,
+    MailModule,
+    OrderModule,
   ],
 })
 export class AppModule {}

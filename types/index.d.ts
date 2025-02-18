@@ -6,6 +6,8 @@ declare namespace NodeJS {
     NODE_ENV: string;
     SERVER_HOST: string;
     SERVER_PORT: number;
+    WEB_SERVER_HOST: string;
+    WEB_SERVER_PORT: number;
     MONGODB_HOST: string;
     MONGODB_PORT: number;
     MONGODB_DBNAME: string;
@@ -14,5 +16,12 @@ declare namespace NodeJS {
     MONGODB_PASSWORD: string;
     JWT_SECRET: string;
     JWT_EXPIRES: number;
+    SMTP_HOST: string;
+    SMTP_PORT: number;
+    SMTP_USERNAME: string;
+    SMTP_PASSWORD: string;
+    SMTP_SECURE_SSL: string;
+    SMTP_SENDER_NAME: string;
+    SMTP_SENDER_EMAIL_DEFAULT: string;
   }
 }
