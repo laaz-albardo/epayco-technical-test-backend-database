@@ -4,7 +4,6 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserRepository } from '@src/modules/user';
 import { IJWTPayload } from '../interfaces';
 import { ConfigService } from '@nestjs/config';
-import { FastifyRequest } from 'fastify';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -15,20 +14,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly config: ConfigService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        JwtStrategy.extractJWTFromCookie,
-        ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ]),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: config.getOrThrow('JWT_SECRET'),
     });
-  }
-
-  private static extractJWTFromCookie(req: FastifyRequest): string | null {
-    if (req.cookies && req.cookies.token && req.cookies.token.length > 0) {
-      return req.cookies.token;
-    }
-    return null;
   }
 
   async validate(payload: IJWTPayload) {
