@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IWallet } from '../interfaces';
-import { IUser, User } from '@src/modules/user';
-import { Types } from 'mongoose';
+import { IUser, UserSchema } from '@src/modules/user';
 
 @Schema({ timestamps: true })
 export class Wallet implements IWallet {
@@ -11,7 +10,7 @@ export class Wallet implements IWallet {
   @Prop({ type: Boolean, required: false, default: true })
   status: boolean;
 
-  @Prop({ type: Types.ObjectId, ref: User.name, required: true })
+  @Prop({ type: UserSchema, required: true })
   user: IUser;
 }
 

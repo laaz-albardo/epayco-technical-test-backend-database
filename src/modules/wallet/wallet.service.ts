@@ -1,9 +1,15 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateWalletDto } from './dto/create-wallet.dto';
 import { UpdateWalletDto } from './dto/update-wallet.dto';
 import { WalletRepository } from './repositories';
 import { Wallet } from './schemas';
 import { WalletDocument } from './types';
+import { UpdateUserWalletDto } from './dto';
 
 @Injectable()
 export class WalletService {
@@ -28,27 +34,91 @@ export class WalletService {
   }
 
   async findOneByUser(_id: string): Promise<WalletDocument> {
-    const walletByUser = await (
-      await this.repository.findOne({ user: _id })
-    ).populate('user');
+    const walletByUser = await this.repository.findOne({ 'user._id': _id });
 
     return walletByUser;
   }
 
-  async update(_id: string, data: UpdateWalletDto): Promise<Wallet> {
+  async findOneByDocumentAndPhoneNumber(
+    document: string,
+    phoneNumber: string,
+  ): Promise<WalletDocument> {
+    this.logger.log('get wallet...');
+
+    const walletByUser = await this.repository.findOne({
+      'user.person.dni': document,
+      'user.person.phoneNumber': phoneNumber,
+    });
+
+    if (!walletByUser) {
+      throw new NotFoundException('Wallet not found');
+    }
+
+    this.logger.log('wallet successfully');
+
+    return walletByUser;
+  }
+
+  async update(
+    document: string,
+    phoneNumber: string,
+    data: UpdateWalletDto,
+  ): Promise<Wallet> {
+    try {
+      this.logger.log('update wallet...');
+
+      const validateWallet = await this.findOneByDocumentAndPhoneNumber(
+        document,
+        phoneNumber,
+      );
+
+      if (!validateWallet.status) {
+        throw new ConflictException('The wallet is not active');
+      }
+
+      const totalBalance = validateWallet.balance + data.balance;
+
+      const updateWallet = await this.repository.update(validateWallet.id, {
+        balance: totalBalance,
+      } as any);
+
+      this.logger.log('wallet updated successfully');
+
+      return updateWallet;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async updateUser(_id: string, data: UpdateUserWalletDto): Promise<Wallet> {
+    try {
+      this.logger.log('update user wallet...');
+
+      const validateWallet = await this.findOneByUser(_id);
+
+      console.log(validateWallet);
+
+      const updateWallet = await this.repository.update(validateWallet.id, {
+        user: data,
+      } as any);
+
+      this.logger.log('user wallet updated successfully');
+
+      return updateWallet;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async updateWalletOrder(_id: string, balance: number): Promise<Wallet> {
     try {
       this.logger.log('update wallet...');
 
       const validateWallet = await this.findOneByUser(_id);
 
-      if (!validateWallet) {
-        throw new NotFoundException('Wallet not found');
-      }
-
-      const updateWallet = await this.repository.update(
-        validateWallet.id,
-        data as WalletDocument,
-      );
+      const updateWallet = await this.repository.update(validateWallet.id, {
+        balance: balance,
+      } as any);
 
       this.logger.log('wallet updated successfully');
 

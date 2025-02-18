@@ -7,6 +7,8 @@ export const configLoader = (): IConfiguration => {
       environment: process.env.NODE_ENV,
       host: process.env.SERVER_HOST,
       port: Number(process.env.SERVER_PORT),
+      webHost: process.env.WEB_SERVER_HOST,
+      webPort: Number(process.env.WEB_SERVER_PORT),
     },
     db: {
       host: process.env.MONGODB_HOST,
@@ -19,6 +21,15 @@ export const configLoader = (): IConfiguration => {
     jwt: {
       secret: process.env.JWT_SECRET,
       expiresIn: process.env.JWT_EXPIRES,
+    },
+    smtp: {
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT),
+      username: process.env.SMTP_USERNAME,
+      password: process.env.SMTP_PASSWORD,
+      secureSsl: process.env.SMTP_SECURE_SSL,
+      senderName: process.env.SMTP_SENDER_NAME,
+      senderEmailDefault: process.env.SMTP_SENDER_EMAIL_DEFAULT,
     },
   };
 };

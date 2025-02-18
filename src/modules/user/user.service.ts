@@ -6,6 +6,7 @@ import { User } from './schemas';
 import { UserDocument } from './types';
 import { isNotEmpty } from 'class-validator';
 import { WalletService } from '../wallet';
+import { OrderService } from '../order';
 
 @Injectable()
 export class UserService {
@@ -13,6 +14,7 @@ export class UserService {
   constructor(
     private readonly repository: UserRepository,
     private readonly walletService: WalletService,
+    private readonly orderService: OrderService,
   ) {}
 
   async create(data: CreateUserDto): Promise<User> {
@@ -27,6 +29,26 @@ export class UserService {
         throw new ConflictException(`${validateUserEmail.email} registered`);
       }
 
+      const validateUserDni = await this.repository.findOne({
+        'person.dni': data.person.dni,
+      });
+
+      if (validateUserDni) {
+        throw new ConflictException(
+          `${validateUserEmail.person.dni} registered`,
+        );
+      }
+
+      const validateUserPhoneNumber = await this.repository.findOne({
+        'person.phoneNumber': data.person.phoneNumber,
+      });
+
+      if (validateUserPhoneNumber) {
+        throw new ConflictException(
+          `${validateUserEmail.person.phoneNumber} registered`,
+        );
+      }
+
       let user = await this.repository.create(data);
 
       user = await this.repository.save(user);
@@ -36,7 +58,7 @@ export class UserService {
       await this.walletService.create({
         balance: 0,
         status: true,
-        user: user._id as any,
+        user: user as User,
       });
 
       return user;
@@ -91,10 +113,41 @@ export class UserService {
         }
       }
 
+      if (isNotEmpty(data.person.dni)) {
+        const validateUserDni = await this.repository.findOne({
+          'person.dni': data.person.dni,
+        });
+
+        if (validateUserDni && validateUserDni.id !== validateUser.id) {
+          throw new ConflictException(
+            'This dni is already registered with another user',
+          );
+        }
+      }
+
+      if (isNotEmpty(data.email)) {
+        const validateUserPhoneNumber = await this.repository.findOne({
+          'person.phoneNumber': data.person.phoneNumber,
+        });
+
+        if (
+          validateUserPhoneNumber &&
+          validateUserPhoneNumber.id !== validateUser.id
+        ) {
+          throw new ConflictException(
+            'This phone number is already registered with another user',
+          );
+        }
+      }
+
       const updateUser = await this.repository.update(
         _id,
         data as UserDocument,
       );
+
+      await this.walletService.updateUser(_id, updateUser as any);
+
+      await this.orderService.updateUserOrder(_id, updateUser as any);
 
       this.logger.log('user updated successfully');
 
